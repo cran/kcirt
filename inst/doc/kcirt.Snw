@@ -1,0 +1,198 @@
+
+
+%%%%%%%%%%%% cd ~/Files/Creations/R/widals/inst/doc ; R64 CMD Sweave widals.Snw
+
+\documentclass[11pt]{article}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{epstopdf}
+\usepackage{caption}
+\usepackage{amsmath, amsthm} %%%%%%%%%%%%%%% MUST BE ADDED
+\usepackage{supertabular}
+\usepackage{wasysym}
+\usepackage{setspace}
+
+\usepackage{Sweave}
+
+\usepackage{tabularx}
+\newcolumntype{Y}{>{\footnotesize\raggedright\arraybackslash}X}
+
+%\singlespacing
+\onehalfspacing
+%\doublespacing
+
+%\usepackage{natbib}
+
+%\usepackage{color}
+%\definecolor{MyDarkGreen}{rgb}{0.0,0.4,0.0}
+%\definecolor{MyDarkRed}{rgb}{0.4,0.0,0.0} 
+%\usepackage[colorlinks=true, urlcolor= MyDarkGreen, linkcolor= MyDarkRed ]{hyperref}
+\usepackage{hyperref}
+
+\DeclareCaptionLabelSeparator{space}
+
+\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+\textwidth = 6.5 in
+\textheight = 9 in
+\oddsidemargin = 0.0 in
+\evensidemargin = 0.0 in
+\topmargin = 0.0 in
+\headheight = 0.0 in
+\headsep = 0.0 in
+\parskip = 0.2in
+\parindent = 0.0in
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}{Definition}
+
+
+
+\newcommand{\ve}{\varepsilon}
+
+
+
+\newcommand{\wt}{\widetilde}
+\newcommand{\wh}{\widehat}
+\newcommand{\0}{\mathbf{0}}
+
+
+
+\newcommand{\st}{\mathrm{ \:\: s.t. \:\: }}
+
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\bm}[1]{\mbox{\boldmath$#1$}}
+\newcommand{\mr}[1]{\mathrm{#1}}
+\newcommand{\mb}[1]{\mathbf{#1}}
+
+\newcommand{\smss}[1]{^{_{#1}}}
+
+\newcommand{\apri}{\smss{\,(-)}}
+\newcommand{\apos}{\smss{\,(+)}}
+
+\newcommand{\betaup}{\rotatebox[origin=c]{12}{$\beta$}}
+
+\newcommand{\ttb}{\hspace{-0.01cm}}
+
+\newcommand{\diag}{\mathsf{diag}}
+\newcommand{\minz}{\mathsf{min}}
+\newcommand{\maxz}{\mathsf{max}}
+\newcommand{\zsin}{\mathsf{sin}}
+\newcommand{\zcos}{\mathsf{cos}}
+
+\newcommand{\SE}{\mathsf{SE}}
+\newcommand{\range}{\mathsf{range}}
+
+\newcommand{\ndxrng}[2]{#1 \,\!\! : \,\!\! #2}
+
+\newenvironment{DZcaption}[2]%
+               {\begin{list}{}{\leftmargin#1\rightmargin#2}\item{}}%
+               {\end{list}}
+
+
+
+%\VignetteIndexEntry{Package kcirt}
+%\VignetteDepends{mvtnorm}
+%\VignetteDepends{snowfall}
+%\VignetteDepends{corpcor}
+
+\begin{document}
+
+\title{Package \texttt{kcirt}}
+\author{Dave Zes, Jimmy Lewis, Dana Landis\\
+    @ Korn/Ferry International}
+\maketitle
+
+
+\section{Intro: What's ``KCIRT''?}
+
+$k$-Cube Item Response Theory.  The model upon which this \texttt{kcirt} package was built --- $k$-Cube IRT, is really only a slight generalization of the ``Forced Choice Thurstonian IRT'' model developed through the excellent work of Anna Brown and Alberto Maydeu-Olivares \cite{BrownOlivares2012}.  The generalization was motivated by a desire to gain insight into how the presence or absence of items or entire blocks might affect the loadings of other items presented within a forced choice assessment.  Mathematically, this generalization is manifest by an almost incidental result of writing the model in full matrix form.
+
+In the formulation given in (\ref{eq1}), the \emph{loadings} matrix, $\bs{\Lambda}$, is symmetric square.  The Forced Choice Thurstonian IRT model assumes $\bs{\Lambda}$ is diagnonal --- but it needn't be.
+
+For example, the loading present as the first element in the first row of $\bs{\Lambda}$ maps the state (scale) to which the first item points into the observation space.  If the second loading in the first row of $\bs{\Lambda}$ is not zero, then the state to which the second item points will \emph{moderate} the relationship between the first item and its manifestation in the observation space.  By permitting non-zeroness of off-diagonal elements in $\bs{\Lambda}$, one might --- so the reasoning goes --- catch a glimpse of how possible interplay between items might affect an instrument's performance.
+
+
+\subsection{The System}
+
+Have $d$ be the number of latent constructs, $p$ be the number of response blocks (or questions), $n$ be the number of items to be assigned rank, and $\tilde{n} = (n-1)n/2$ be the number of possible one-sided pairings between the $n$ items.
+
+
+For each observational unit,
+%
+%
+\begin{align}
+\bs{y}^{\star} =& \,\,   \mb{\Delta} \,  \bs{\mu} \,     +       \,   \mb{\Delta} \, \bs{\Lambda} \, \mb{S} \, \bs{\eta}    +   \mb{\Delta} \, \bs{\varepsilon}      \label{eq1}     \\
+\bs{y}   =& \,\,  \mb{1}_{\bs{y}^{\star} > \, 0}      \label{eq2}
+\end{align}
+%
+%
+where $\mb{\Delta}$, the ``delta'' function, is $(\tilde{n} \, p) \times (n \, p)$;  $\bs{\Lambda}$, the system hyperparameter, is $(n \, p) \times (n \, p)$;  $\mb{S}$, the ``slot'' function, is $(n \, p) \times d$;  $\bs{\eta}$, the latent state, is $d \times 1$;  and $\bs{\varepsilon} \sim \mathcal{N}[ \mb{0}, \mb{I} \, \sigma_{\varepsilon}^2]$ describe the system shocks.
+
+The latent state is assumed to arise through $\bs{\eta}  \sim \mathcal{N}[ \mb{0}, \Sigma_{\eta}]$ --- furthermore, we assume that this random variable, as well as the shocks, $\bs{\ve}$, are independently realized across observational units.
+
+The system observational-space is occupied by $\bs{y}$;  the value $\bs{y}^{\star}$ is unobserved.
+
+Generally, the objective is predicting the system states, $\bs{\eta}$, through concomitant estimation of the hyperparameters, $\bs{\Lambda}$, given realizations of $\bs{y}$.  $\mb{S}$ and $\mb{\Delta}$ are defined through the mappings between items and states, and are hence known; they, along with $\bs{\Lambda}$ and the item utilities, $\bs{\mu}$, are assumed to be invariant across observational units.
+
+
+
+
+
+
+%\section{Final Thoughts}
+
+%\cite{Wasserman}
+
+%\cite{Efrom}
+
+
+%\bibliographystyle{plainnat}
+
+%\bibliographystyle{jes}
+
+\bibliographystyle{abbrv}
+
+
+\bibliography{kcirt}
+
+
+
+
+ \end{document}
+
+
+
+<<eval=FALSE, results=hide>>=
+
+
+setwd("/Users/dzes/KF_Files/KF_Creations/KF_R/kcirt/inst/doc")
+Sweave("kcirt.Snw")
+
+
+@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
