@@ -60,7 +60,13 @@ qTypes <- rep("R", length(constructMap.ls))
     
 mod <- kcirt.model(constructMap.ls=constructMap.ls, qTypes=qTypes, mxLambda=NULL)
 
-kcirt.ystarinfo(mod)
+mxInfo <- kcirt.ystarinfo(mod)
+
+mxInfo
+
+mxPrecision <- solve(mxInfo)
+
+mxPrecision
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

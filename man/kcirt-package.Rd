@@ -12,8 +12,8 @@ Create, Simulate, Fit, Solve k-Cube Thurstonian IRT Models.
 \tabular{ll}{
 Package: \tab kcirt\cr
 Type: \tab Package\cr
-Version: \tab 0.5.2\cr
-Date: \tab 2013-10-10\cr
+Version: \tab 0.5.4\cr
+Date: \tab 2013-11-12\cr
 License: \tab GPL (>= 2)\cr
 }
 Use \code{\link{kcirt.model}} to define a k-Cube Thurstonian IRT model. The function \code{\link{kcirt.sim}} generates a random realization.  The function \code{\link{kcirt.fitEE}} uses an expectation-expectation volley to approximately locate \code{mu} and \code{Lambda} and predict the states, \code{Eta}.  The function \code{\link{kcirt.fitMSS}} makes use of metaheuristic stochastic search to further refine the predictions/estimates.

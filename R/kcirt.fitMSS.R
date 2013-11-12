@@ -89,31 +89,34 @@ function(model, lambdaConstraint="self", kcpus=2, penalty="logit", usetruesigma=
     
     sfExport("mxHatLSE")
     
-    cat("Locating mu ...", "\n")
-    for(iimss in 1:length(hatMu)) {
+    if(mss.sd[1] != 0) {
         
-        rndTrys <- hatMu[iimss] + c( 0, rnorm(nsearch, 0, mss.sd[1]) )
-        
-        if( run.parallel ) {
-            sfOut <- sfClusterApplyLB( x=1:length(rndTrys), fun=ikcirt.fun.mss.mu, iimss=iimss, rndTrys=rndTrys, hatMu=hatMu,
-            useSysCov=useSysCov,
-            penalty=penalty )
+        cat("Locating mu ...", "\n")
+        for(iimss in 1:length(hatMu)) {
             
+            rndTrys <- hatMu[iimss] + c( 0, rnorm(nsearch, 0, mss.sd[1]) )
+            
+            if( run.parallel ) {
+                sfOut <- sfClusterApplyLB( x=1:length(rndTrys), fun=ikcirt.fun.mss.mu, iimss=iimss, rndTrys=rndTrys, hatMu=hatMu,
+                useSysCov=useSysCov,
+                penalty=penalty )
+                
+            }
+            cost.vec <- unlist(sfOut)
+            cost.vec[is.na(cost.vec)] <- Inf
+            cost.vec[is.nan(cost.vec)] <- Inf
+            
+            xndx.mincost <- which.min(cost.vec)
+            best.cost <- cost.vec[ xndx.mincost ]
+            
+            hatMu[iimss] <- rndTrys[xndx.mincost]
+            
+            #cat(best.cost, "\n")
+            
+            txtProgressBar(min = 0, max = length(hatMu), initial = iimss, char = "=", width = 100, style=3)
         }
-        cost.vec <- unlist(sfOut)
-        cost.vec[is.na(cost.vec)] <- Inf
-        cost.vec[is.nan(cost.vec)] <- Inf
-        
-        xndx.mincost <- which.min(cost.vec)
-        best.cost <- cost.vec[ xndx.mincost ]
-        
-        hatMu[iimss] <- rndTrys[xndx.mincost]
-        
-        #cat(best.cost, "\n")
-        
-        txtProgressBar(min = 0, max = length(hatMu), initial = iimss, char = "=", width = 100, style=3)
+        cat("\n\n")
     }
-    cat("\n\n")
     
     ######################################## MSS hatLambda search
     
@@ -125,51 +128,53 @@ function(model, lambdaConstraint="self", kcpus=2, penalty="logit", usetruesigma=
     
     sfExport("mxStHE", "mxHatEta", "hatMu")
     
-    cat("Locating Lambda ...", "\n")
-    for(iimss in 1:nrow(mxHatLambda)) {
-        for(jjmss in 1:ncol(mxHatLambda)) {
-            
-            this.Linfo <- mxLambdaCTinfo[iimss, jjmss]
-            
-            if( (lambdaConstraint == "self" & this.Linfo == "S") |
-            
-            ( lambdaConstraint == "withinx" & (this.Linfo == "S" | this.Linfo == "WF") ) |
-            ( lambdaConstraint == "withini" & (this.Linfo == "S" | this.Linfo == "WF" | this.Linfo == "WT") ) |
-            ( lambdaConstraint == "betweenx" & (this.Linfo == "S" | this.Linfo == "WF" | this.Linfo == "BF") ) |
-            ( lambdaConstraint == "betweeni" & (this.Linfo == "S" | this.Linfo == "WF" | this.Linfo == "BF" | this.Linfo == "WT" | this.Linfo == "BT") ) |
-            
-            ( lambdaConstraint == "priorx" & (this.Linfo == "S" | this.Linfo == "WF" | (jjmss < iimss & this.Linfo == "BF") ) ) |
-            ( lambdaConstraint == "priori" & (this.Linfo == "S" | this.Linfo == "WF" | this.Linfo == "WT" | (jjmss < iimss & ( this.Linfo == "BF" | this.Linfo == "BT" ) ) ) )
-            
-            ) {
+    if(mss.sd[2] != 0) {
+        
+        cat("Locating Lambda ...", "\n")
+        for(iimss in 1:nrow(mxHatLambda)) {
+            for(jjmss in 1:ncol(mxHatLambda)) {
                 
+                this.Linfo <- mxLambdaCTinfo[iimss, jjmss]
                 
-                rndTrys <- mxHatLambda[iimss, jjmss] + c( 0, rnorm(nsearch, 0, mss.sd[2]) )
+                if( (lambdaConstraint == "self" & this.Linfo == "S") |
                 
-                if( run.parallel ) {
-                    sfOut <- sfClusterApplyLB( x=1:length(rndTrys), fun=ikcirt.fun.mss.lambda, iimss=iimss, jjmss=jjmss,
-                    rndTrys=rndTrys,
-                    mxHatLambda=mxHatLambda,
-                    penalty=penalty, usetruesigma=usetruesigma )
+                ( lambdaConstraint == "withinx" & (this.Linfo == "S" | this.Linfo == "WF") ) |
+                ( lambdaConstraint == "withini" & (this.Linfo == "S" | this.Linfo == "WF" | this.Linfo == "WT") ) |
+                ( lambdaConstraint == "betweenx" & (this.Linfo == "S" | this.Linfo == "WF" | this.Linfo == "BF") ) |
+                ( lambdaConstraint == "betweeni" & (this.Linfo == "S" | this.Linfo == "WF" | this.Linfo == "BF" | this.Linfo == "WT" | this.Linfo == "BT") ) |
+                
+                ( lambdaConstraint == "priorx" & (this.Linfo == "S" | this.Linfo == "WF" | (jjmss < iimss & this.Linfo == "BF") ) ) |
+                ( lambdaConstraint == "priori" & (this.Linfo == "S" | this.Linfo == "WF" | this.Linfo == "WT" | (jjmss < iimss & ( this.Linfo == "BF" | this.Linfo == "BT" ) ) ) )
+                
+                ) {
                     
+                    
+                    rndTrys <- mxHatLambda[iimss, jjmss] + c( 0, rnorm(nsearch, 0, mss.sd[2]) )
+                    
+                    if( run.parallel ) {
+                        sfOut <- sfClusterApplyLB( x=1:length(rndTrys), fun=ikcirt.fun.mss.lambda, iimss=iimss, jjmss=jjmss,
+                        rndTrys=rndTrys,
+                        mxHatLambda=mxHatLambda,
+                        penalty=penalty, usetruesigma=usetruesigma )
+                        
+                    }
+                    cost.vec <- unlist(sfOut) ; cost.vec
+                    cost.vec[is.na(cost.vec)] <- Inf
+                    cost.vec[is.nan(cost.vec)] <- Inf
+                    
+                    xndx.mincost <- which.min(cost.vec)
+                    best.cost <- cost.vec[ xndx.mincost ]
+                    
+                    mxHatLambda[iimss, jjmss] <- rndTrys[xndx.mincost]
+                    
+                    #cat(best.cost, "\n")
                 }
-                cost.vec <- unlist(sfOut) ; cost.vec
-                cost.vec[is.na(cost.vec)] <- Inf
-                cost.vec[is.nan(cost.vec)] <- Inf
                 
-                xndx.mincost <- which.min(cost.vec)
-                best.cost <- cost.vec[ xndx.mincost ]
-                
-                mxHatLambda[iimss, jjmss] <- rndTrys[xndx.mincost]
-                
-                #cat(best.cost, "\n")
+                txtProgressBar(min = 0, max = nrow(mxHatLambda), initial = iimss, char = "=", width = 100, style=3)
             }
-            
-            txtProgressBar(min = 0, max = nrow(mxHatLambda), initial = iimss, char = "=", width = 100, style=3)
         }
+        cat("\n\n")
     }
-    cat("\n\n")
-    
     
     ######################################## MSS hatEta search
     
@@ -180,40 +185,43 @@ function(model, lambdaConstraint="self", kcpus=2, penalty="logit", usetruesigma=
     
     iimss <- 1 ; jjmss <- 1
     
-    cat("Locating Eta ...", "\n")
-    for(iimss in 1:nrow(mxHatEta)) {
-        for(jjmss in 1:ncol(mxHatEta)) {
-            
-            rndTrys <- mxHatEta[iimss, jjmss] + c( 0, rnorm(nsearch, 0, mss.sd[3]) )
-            
-            if( run.parallel ) {
-                sfOut <- sfClusterApplyLB( x=1:length(rndTrys), fun=ikcirt.fun.mss.eta, iimss=iimss, jjmss=jjmss,
-                rndTrys=rndTrys,
-                mxHatEta=mxHatEta,
-                penalty=penalty, usetruesigma=usetruesigma )
+    if(mss.sd[3] != 0) {
+        
+        cat("Locating Eta ...", "\n")
+        for(iimss in 1:nrow(mxHatEta)) {
+            for(jjmss in 1:ncol(mxHatEta)) {
+                
+                rndTrys <- mxHatEta[iimss, jjmss] + c( 0, rnorm(nsearch, 0, mss.sd[3]) )
+                
+                if( run.parallel ) {
+                    sfOut <- sfClusterApplyLB( x=1:length(rndTrys), fun=ikcirt.fun.mss.eta, iimss=iimss, jjmss=jjmss,
+                    rndTrys=rndTrys,
+                    mxHatEta=mxHatEta,
+                    penalty=penalty, usetruesigma=usetruesigma )
+                    
+                }
+                
+                cost.vec <- unlist(sfOut)
+                cost.vec[is.na(cost.vec)] <- Inf
+                cost.vec[is.nan(cost.vec)] <- Inf
+                
+                xndx.mincost <- which.min(cost.vec)
+                best.cost <- cost.vec[ xndx.mincost ]
+                
+                mxHatEta[iimss, jjmss] <- rndTrys[xndx.mincost]
+                
+                #cat(iimss, jjmss, best.cost, "\n")
+                
+                
+                txtProgressBar(min = 0, max = nrow(mxHatEta), initial = iimss, char = "=", width = 100, style=3)
                 
             }
-            
-            cost.vec <- unlist(sfOut)
-            cost.vec[is.na(cost.vec)] <- Inf
-            cost.vec[is.nan(cost.vec)] <- Inf
-            
-            xndx.mincost <- which.min(cost.vec)
-            best.cost <- cost.vec[ xndx.mincost ]
-            
-            mxHatEta[iimss, jjmss] <- rndTrys[xndx.mincost]
-            
-            #cat(iimss, jjmss, best.cost, "\n")
-            
-            
-            txtProgressBar(min = 0, max = nrow(mxHatEta), initial = iimss, char = "=", width = 100, style=3)
-            
+            #txtProgressBar(min = 0, max = length(hatMu), initial = iimss, char = "=", width = 100, style=3)
         }
-        #txtProgressBar(min = 0, max = length(hatMu), initial = iimss, char = "=", width = 100, style=3)
+        
+        cat("\n\n")
+        
     }
-    
-    cat("\n\n")
-    
     
     if(sfIsRunning()) { sfStop() }
     

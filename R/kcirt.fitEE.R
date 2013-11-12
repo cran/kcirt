@@ -1,5 +1,5 @@
 kcirt.fitEE <-
-function(model, mxHatLambda, maxIter=40) {
+function(model, mxHatLambda, maxIter=40, lambda.ridge=0.3, Seta.ridge=0.01) {
     
     
     preSS <- solve(crossprod(model$mxSlot)) %*% t(model$mxSlot)
@@ -47,7 +47,7 @@ function(model, mxHatLambda, maxIter=40) {
         PRIORmxHatEta <- mxHatEta
         
         LLcov <- crossprod(mxHatLambda)
-        invLLcov <- solve(LLcov + diag(0.3, ncol(mxHatLambda)))
+        invLLcov <- solve(LLcov + diag(lambda.ridge, ncol(mxHatLambda)))
         ##invLLcov <- pseudoinverse(LLcov)
         
         hatSeta <- t( invLLcov %*% t(mxHatLambda) %*% (sqrt(diag(hatSysCov)) * ddZc))
@@ -58,13 +58,15 @@ function(model, mxHatLambda, maxIter=40) {
         
         dim(hatCovSeta)
         
-        invHatXXSeta <- pseudoinverse( hatXXSeta + diag(0.3, ncol(hatCovSeta)) )
+        invHatXXSeta <- pseudoinverse( hatXXSeta + diag(Seta.ridge*nrow(hatSeta), ncol(hatCovSeta)) )
         #invHatXXSeta <- pseudoinverse( hatXXSeta  )
         
         mxHatLambda <- invHatXXSeta %*% t(hatSeta) %*% t(sqrt(diag(hatSysCov)) * ddZc)
         
         ################################################### constraints
-        mxHatLambda[ model$mxLambda == 0 ] <- 0
+        #mxHatLambda[ model$mxLambda == 0 ] <- 0
+        
+        mxHatLambda <- mxHatLambda * diag(1, ncol(mxHatLambda))
         
         hatddZc <- mxHatLambda %*% t(hatSeta)
         

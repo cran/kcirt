@@ -17,7 +17,7 @@ covEta = 1, covShocks = 1, deltaType=1)
 How the constructs map to the items.  A list of vectors, each vector representing a block (question in the instrument); each element of a vector giving the construct index.
 }
   \item{qTypes}{
-Is a question to be fully ranked or most/least format.  A character vector whose length is the number of blocks.  Each element in \code{\{'R', 'M'\}}.  Note that only accepts 'R' when corresponding block has 3 or 2 items.
+Is a question to be fully ranked or most/least format.  A character vector whose length is the number of blocks.  Each element in \code{\{"R", "M"\}}.  Note that only accepts 'R' when corresponding block has 3 or 2 items.
 }
   \item{data}{
 Data matrix.  The number of columns is the number of observational units, the number of rows is the total number of items.
@@ -45,7 +45,7 @@ Tell function in what pattern items are compared.  Scalar.  Directly affects str
 %%  ~~ If necessary, more details than the description above ~~
 %}
 \value{
-	A kcirt model.  A named list of \code{class} 'kcube.irt.model'.
+A kcirt model.  A named list of \code{class} ``kcube.irt.model''.
 %%  ~Describe the value returned
 %%  If it is a LIST, use
 %%  \item{comp1 }{Description of 'comp1'}

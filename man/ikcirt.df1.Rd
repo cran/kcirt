@@ -23,7 +23,7 @@ A scalar string.  Please see \code{\link{kcirt.fitMSS}}.
 %%  ~~ If necessary, more details than the description above ~~
 %}
 \value{
-A kcirt model.  A named list of \code{class} 'kcube.irt.model'.
+Scalar integer.
 %%  ~Describe the value returned
 %%  If it is a LIST, use
 %%  \item{comp1 }{Description of 'comp1'}

@@ -13,7 +13,7 @@ kcirt.sim(model, N, type = "Eta")
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{model}{
-		A kcirt model.  A named list of \code{class} 'kcube.irt.model'.
+A kcirt model.  A named list of \code{class} 'kcube.irt.model'.
 }
   \item{N}{
 Number of observations.
@@ -50,8 +50,8 @@ Dave Zes, Korn/Ferry International
 %}
 \examples{
 ## Please see example in, e.g., kcirt.fitMSS.
-
 }
+
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ ~kwd1 }

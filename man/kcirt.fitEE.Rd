@@ -8,7 +8,7 @@ Least Squares k-Cube Thurstonian IRT Fitting
 k-Cube Thurstonian IRT Fitting using a least-squares expectation-expectation algorithm.
 }
 \usage{
-kcirt.fitEE(model, mxHatLambda, maxIter = 40)
+kcirt.fitEE(model, mxHatLambda, maxIter = 40, lambda.ridge = 0.3, Seta.ridge=0.01)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -20,6 +20,12 @@ An initial guess for the Hyperparameters.
 }
   \item{maxIter}{
 Maximum number of iterations.
+}
+  \item{lambda.ridge}{
+Non-negative real-valued scalar.  Amount of Ridge shrinkage on hatLambda crossproduct for LS stages.
+}
+  \item{Seta.ridge}{
+Non-negative real-valued scalar.  Amount of Ridge shrinkage on SEta crossproduct for LS stages.
 }
 }
 \details{

@@ -2,7 +2,7 @@
 \alias{ikcirt.Ustar2data}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Convert \code{U}* to Data to Data
+Convert \code{U}* to Data
 }
 \description{
 Convert the non-differenced latent responses to Data.  Probably no need for user to call; called by \code{\link{kcirt.sim}}.
