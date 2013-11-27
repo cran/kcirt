@@ -9,7 +9,8 @@ Use metaheuristic stochastic search to locate k-Cube Thurstonian IRT hyperparame
 }
 \usage{
 kcirt.fitMSS(model, lambdaConstraint = "self", kcpus = 2, penalty = "logit", 
-usetruesigma = TRUE, mss.sd = 0.2, nsearch = 19, l2zvarpow = 0)
+usetruesigma = TRUE, mss.sd = 0.2, nsearch = 19, l2zvarpow = 0, 
+xmu.shrink=0, xlambda.shrink=0, xeta.shrink=0.4)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -37,11 +38,21 @@ Scalar positive integer.  How many candidate values to draw from under the MSS f
   \item{l2zvarpow}{
 Scalar positive integer.  Only used when \code{penalty} is 'L2c'.  Power by which to raise \code{var(2*Y-1)}; the amount of 'smoothing' to impose on \code{2*Y-1}.  Note that when zero, setting \code{penalty} to 'L2c' produces identical results to 'L2' -- though slightly slower computationally.
 }
+  \item{xmu.shrink}{
+Scalar non-negative real-valued.  Only used when \code{penalty} is 'logit'.  How much to shrink utility estimates towards zero.
+}
+  \item{xlambda.shrink}{
+Scalar non-negative real-valued.  Only used when \code{penalty} is 'logit'.  How much to shrink loading estimates towards zero.
+}
+  \item{xeta.shrink}{
+Scalar non-negative real-valued.  Only used when \code{penalty} is 'logit'.  How much to shrink state predictions towards zero.
+}
 }
 \details{
+	Note: As of kcirt version >= 0.6, the argument \code{logitshrinkcoef} has been removed.  Use \code{xeta.shrink} instead.
 \bold{lambdaConstraint} defines the model k-cube, i.e., the item crosstalk space.  Currently accepts \code{self}, only diagonal elements of \code{Lambda}; \code{withinx}, additionally includes within block items pointing to e\bold{x}ogenous constructs; \code{withini}, additionally includes items within block pointing to same construct.  \code{betweenx}, diagonal elements and all other items that point to different constructs; \code{betweeni}, additionally includes items that point to same construct.  \code{priorx} is similar to \code{betweenx} except that only previous items crosstalk with item, i.e., \code{Lambda} is lower-block-diagonal; \code{priori} additionally permits crosstalk between prior items pointing to same construct.
 
-\bold{penalty} defines the ojective function to be minimized.  \code{logit} minimizes the logistic deviance with shrinkage ||eta||.  \code{L2} minimizes sum of squares between \code{2*Y-1} and \code{2*Yhat-1}.  \code{L2c} is similar to \code{L2}, except that it pre-projects (up to a constant) \code{2*Y-1} and \code{2*Yhat-1} using \code{var(2*Y-1)}.  Note that \code{NA} values in \code{Y} are replaced with 0.5.  Finally, \code{miscat}, minimizes the misclassification rate using a confusion table between the observations, \code{Y}, and the predicted states (scales), \code{hatEta}, split at zero.
+\bold{penalty} defines the objective function to be minimized.  \code{logit} minimizes the logistic deviance.  \code{L2} minimizes sum of squares between \code{2*Y-1} and \code{2*Yhat-1}.  \code{L2c} is similar to \code{L2}, except that it pre-projects (up to a constant) \code{2*Y-1} and \code{2*Yhat-1} using \code{var(2*Y-1)}.  Note that \code{NA} values in \code{Y} are replaced with 0.5.  Finally, \code{miscat}, minimizes the misclassification rate using a confusion table between the observations, \code{Y}, and the predicted states (scales), \code{hatEta}, split at zero.
 
 Excepting very adventurous explorations with this model, the defaults for \bold{lambdaConstraint} and \bold{penalty} will likely best serve the user.
 }

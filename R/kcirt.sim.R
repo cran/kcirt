@@ -5,6 +5,11 @@ function(model, N, type="Eta") {
     
     mxShocks <- rmvnorm(N, rep(0, sum(model$ns)), model$covShocks)
     
+    ##mxEta <- matrix(rnorm(N*model$nuc, 0, 1), N, model$nuc)
+    
+    ##mxShocks <- matrix(rnorm(N*sum(model$ns), 0, 1), N, sum(model$ns))
+    
+    
     Ustar <- matrix( model$mu, sum(model$ns), N )    +    model$mxLambda %*%  model$mxSlot %*% t(mxEta)  +  t(mxShocks)
     
     Ystar <- model$mxDelta %*% Ustar

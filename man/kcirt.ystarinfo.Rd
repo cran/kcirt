@@ -64,9 +64,9 @@ mxInfo <- kcirt.ystarinfo(mod)
 
 mxInfo
 
-mxPrecision <- solve(mxInfo)
+mxErrorVar <- solve(mxInfo)
 
-mxPrecision
+mxErrorVar
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

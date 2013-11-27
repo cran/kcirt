@@ -8,7 +8,7 @@ function(jj, iimss, jjmss, rndTrys, mxHatEta, penalty, usetruesigma ) {
     mxDelta <- get("mxDelta")
     mxHatLS <- get("mxHatLS")
     hatMu <- get("hatMu")
-    
+    xeta.shrink <- get("xeta.shrink")
     
     
     
@@ -33,12 +33,11 @@ function(jj, iimss, jjmss, rndTrys, mxHatEta, penalty, usetruesigma ) {
     
     if(penalty == "logit") {
         Y <- get("Y")
-        halfTotRespDivNuc <- get("halfTotRespDivNuc")
         covStochastic <- get("covStochastic")
         yy=Y[ , iimss]
         hatwwstar <- hatzzstar / sqrt(diag(covStochastic))
         hatyy <- pnorm( hatwwstar )
-        our.cost <- - mean( yy * log(hatyy) + (1-yy) * log(1-hatyy), na.rm=TRUE ) + halfTotRespDivNuc*mean( mxHatEta[iimss, ]^2 ) ; our.cost
+        our.cost <- - mean( yy * log(hatyy) + (1-yy) * log(1-hatyy), na.rm=TRUE ) + xeta.shrink * mean( mxHatEta[iimss, ]^2 ) ; our.cost
     }
     
     if(penalty == "L2") {

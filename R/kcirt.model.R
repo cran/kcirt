@@ -68,11 +68,14 @@ function(constructMap.ls, qTypes, data=NULL, Y=NULL, mu=0, mxLambda=NULL, covEta
     
     ################################################ create mx Slot
     
+    constructKey <- sort(unique(unlist(constructMap.ls))) ; constructKey
+    
     mxSlot <- matrix(0, sum(ns), nuc)
     #xzero.vec <- rep(0, nuc)
     ndx.startRow <- 0
     for(ib in 1:nBlocks) {
-        thisCmap <- constructMap.ls[[ib]]
+        thisCmap <- constructMap.ls[[ib]] ; thisCmap
+        thisCmap <- match(thisCmap, constructKey) ; thisCmap
         for(i in 1:length(thisCmap)) {
             ndx.startRow <- ndx.startRow + 1
             mxSlot[ ndx.startRow, thisCmap[i] ] <- 1
@@ -170,8 +173,8 @@ function(constructMap.ls, qTypes, data=NULL, Y=NULL, mu=0, mxLambda=NULL, covEta
     }
     
     if(is.matrix(Y.out)) {
-        Z <- 2*Y-1
-        Yisna <- is.na(Y)
+        Z <- 2*Y.out-1
+        Yisna <- is.na(Y.out)
     } else {
         Z <- NULL
         Yisna <- NULL
@@ -197,7 +200,8 @@ function(constructMap.ls, qTypes, data=NULL, Y=NULL, mu=0, mxLambda=NULL, covEta
     "covStochastic"=covStochastic,
     "mxSigma"=mxSigma,
     "Qid" = Qid,
-    "mxLambdaCTinfo" = mxLambdaCTinfo
+    "mxLambdaCTinfo" = mxLambdaCTinfo,
+    "constructSlotKey" = constructKey
     )
     
     class(out.ls) <- "kcube.irt.model"

@@ -32,11 +32,23 @@ function(jj, iimss, jjmss, rndTrys, mxHatLambda, penalty, usetruesigma ) {
     
     
     if(penalty == "logit") {
+        
+        
+        
         covStochastic <- get("covStochastic")
         Y <- get("Y")
+        xlambda.shrink <- get("xlambda.shrink")
+        xbool.lambdaShrinkLL <- get("xbool.lambdaShrinkLL")
+        
+        if(xbool.lambdaShrinkLL) {
+            xshrinkTerm <- xlambda.shrink * mean( diag(mxHatLambda %*% t(mxHatLambda)) )
+        } else {
+            xshrinkTerm <- xlambda.shrink * mean( diag(mxHatLambda)^2 )
+        }
+        
         hatWstar <- hatZstar / sqrt(diag(covStochastic))
         hatY <- matrix( pnorm( hatWstar ), nrow(hatWstar), ncol(hatWstar) )
-        our.cost <- - mean( Y * log(hatY) + (1-Y) * log(1-hatY), na.rm=TRUE ) ; our.cost
+        our.cost <- - mean( Y * log(hatY) + (1-Y) * log(1-hatY), na.rm=TRUE ) + xshrinkTerm ; our.cost
     }
     
     if(penalty == "L2") {

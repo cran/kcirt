@@ -16,9 +16,11 @@ function(jj, iimss, rndTrys, hatMu, useSysCov, penalty ) {
     
     if(penalty == "logit") {
         Y <- get("Y")
+        xmu.shrink <- get("xmu.shrink")
+        
         hatWstar <- hatZstar / sqrt(diag(covStochastic))
         hatY <- matrix( pnorm( hatWstar ), nrow(hatWstar), ncol(hatWstar) )
-        our.cost <- - mean( Y * log(hatY) + (1-Y) * log(1-hatY), na.rm=TRUE ) ; our.cost
+        our.cost <- - mean( Y * log(hatY) + (1-Y) * log(1-hatY), na.rm=TRUE )  + xmu.shrink * mean( (hatMu)^2 ) ; our.cost
     }
     
     if(penalty == "L2") {

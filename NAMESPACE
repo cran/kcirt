@@ -1,1 +1,5 @@
 exportPattern("^[[:alpha:]]+")
+importFrom("snowfall", sfClusterApplyLB)
+importFrom("corpcor", pseudoinverse)
+importFrom("corpcor", mpower)
+importFrom("mvtnorm", rmvnorm)

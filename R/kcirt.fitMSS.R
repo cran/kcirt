@@ -1,7 +1,7 @@
 kcirt.fitMSS <-
-function(model, lambdaConstraint="self", kcpus=2, penalty="logit", usetruesigma=TRUE, mss.sd=0.2, nsearch=19, l2zvarpow=0) {
+function(model, lambdaConstraint="self", kcpus=2, penalty="logit", usetruesigma=TRUE, mss.sd=0.2, nsearch=19, l2zvarpow=0, xmu.shrink=0, xlambda.shrink=0, xeta.shrink=0.4) {
     
-    ### lambdaConstraint="self"; kcpus=2; penalty="logit"; usetruesigma=TRUE; mss.sd=0.2; nsearch=19
+
     
     if(length(mss.sd)==1) { mss.sd <- rep(mss.sd, 3) }
     
@@ -23,7 +23,11 @@ function(model, lambdaConstraint="self", kcpus=2, penalty="logit", usetruesigma=
     
     if(penalty == "L2c") {
         Z[is.na(Z)] <- 0
-        varZ <- mpower( (ncol(Z)^(-1) * tcrossprod(Z)), l2zvarpow )
+        if(usetruesigma) {
+            varZ <- mxSigma
+        } else {
+            varZ <- mpower( (ncol(Z)^(-1) * tcrossprod(Z)), l2zvarpow )
+        }
         Zconv <- varZ %*% Z
     }
     
@@ -43,7 +47,6 @@ function(model, lambdaConstraint="self", kcpus=2, penalty="logit", usetruesigma=
     
     hatZstar <- mxDelta %*% ( hatMu  +  mxHatLSE )
     
-    halfTotRespDivNuc <- 0.5 * model$nuc / nrow(Y) ; halfTotRespDivNuc #########
     
     if(penalty == "logit") {
         hatWstar <- hatZstar / sqrt(diag(covStochastic))
@@ -81,7 +84,7 @@ function(model, lambdaConstraint="self", kcpus=2, penalty="logit", usetruesigma=
         sfExport("varZ", "Zconv")
     }
     if(penalty == "logit") {
-        sfExport("halfTotRespDivNuc")
+        sfExport("xmu.shrink", "xlambda.shrink", "xeta.shrink")
     }
     
     #sfExport("varZ", "Zconv", "halfTotRespDivNuc")
@@ -130,6 +133,14 @@ function(model, lambdaConstraint="self", kcpus=2, penalty="logit", usetruesigma=
     
     if(mss.sd[2] != 0) {
         
+        if(lambdaConstraint == "self") {
+            xbool.lambdaShrinkLL <- FALSE
+        } else {
+            xbool.lambdaShrinkLL <- TRUE
+        }
+        sfExport("xbool.lambdaShrinkLL")
+
+
         cat("Locating Lambda ...", "\n")
         for(iimss in 1:nrow(mxHatLambda)) {
             for(jjmss in 1:ncol(mxHatLambda)) {
